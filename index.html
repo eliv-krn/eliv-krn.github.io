@@ -2,19 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lnk | eLvn</title>
+    <title>eLvn | lnk</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/feather-icons"></script>
 
     <style>
-      html,
+      html {
+        scroll-behavior: smooth;
+      }
       body {
         margin: 0;
         padding: 0;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
+      /* === Canvas === */
       canvas#bg-canvas {
         position: fixed;
         top: 0;
@@ -22,9 +27,10 @@
         width: 100%;
         height: 100%;
         z-index: -1;
+        pointer-events: none;
       }
 
-      /* ------------------ Submenu ------------------ */
+      /* === Submenu === */
       .submenu {
         max-height: 0;
         overflow: hidden;
@@ -34,32 +40,43 @@
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        border-radius: 12px;
-        backdrop-filter: blur(6px);
-        background-color: rgba(31, 41, 55, 0.95);
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.35s ease, padding 0.35s ease;
+        will-change: opacity, transform;
       }
+
       .submenu.open {
         max-height: 500px;
         opacity: 1;
-        margin-top: 0.5rem;
-        padding: 0.75rem;
+        margin-top: 0.75rem;
+        padding: 0.85rem;
       }
+
       .submenu a {
         border-radius: 10px;
-        padding: 0.5rem 1rem;
+        padding: 0.6rem 1rem;
         display: flex;
-        justify-content: left;
-        align-items: left;
+        align-items: center;
         gap: 0.5rem;
         transform: translateX(-20px);
-        opacity: 0;
         transition: transform 0.35s ease, opacity 0.35s ease;
+        opacity: 0.9;
+        font-size: 0.8rem;
+        font-family: "Poppins", sans-serif;
+        letter-spacing: 0.3px;
+        color: #f9fafb;
+        will-change: transform, opacity;
       }
+
       .submenu a:hover {
         transform: translateX(5px);
-        background-color: rgba(96, 165, 250, 0.25);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
       }
 
       .chevron {
@@ -69,6 +86,7 @@
         transform: rotate(180deg);
       }
 
+      /* === Link Blocks === */
       .link-block {
         margin-bottom: 1rem;
       }
@@ -82,24 +100,29 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        padding: 0.75rem;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        background-color: #1f2937;
+        padding: 0.85rem 1rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         color: #f9fafb;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        border: 1px solid #374151;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        font-family: "Poppins", sans-serif;
+        transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+        will-change: transform;
       }
       .link-item:hover,
       .link-toggle:hover {
-        background-color: #374151;
-        box-shadow: 0 0 10px rgba(0, 114, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 16px rgba(56, 189, 248, 0.35);
+        transform: translateY(-2px);
       }
       .link-toggle.active {
-        background: linear-gradient(90deg, #1f2937, #2d3748);
-        box-shadow: 0 0 12px rgba(0, 114, 255, 0.5);
+        background: rgba(56, 189, 248, 0.25);
+        border-color: rgba(96, 165, 250, 0.4);
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
       }
 
+      /* === Profile Image === */
       img {
         width: 6rem;
         height: 6rem;
@@ -109,6 +132,7 @@
         transition: box-shadow 0.5s ease, border-color 0.5s ease;
       }
 
+      /* === Theme Toggle === */
       #theme-toggle {
         background: none;
         border: none;
@@ -121,39 +145,82 @@
         transform: scale(1.15);
       }
 
+      /* === Layout & Theme === */
       body {
         background-color: #111827;
         color: #f9fafb;
         transition: background-color 0.5s ease, color 0.5s ease;
         min-height: 100vh;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        justify-content: flex-start;
         align-items: center;
+        padding-top: 6vh;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
+
       body.light {
         background: linear-gradient(180deg, #e0f2fe, #f9fafb);
         color: #1e293b;
       }
+
       body.light .link-item,
-      body.light .link-toggle,
+      body.light .link-toggle {
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        color: #1e293b;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      }
+
+      body.light .link-item:hover,
+      body.light .link-toggle:hover {
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 20px rgba(56, 189, 248, 0.2);
+      }
+
       body.light .submenu {
-        background-color: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
         color: #1f2937;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
       }
-      body.light .link-toggle:hover,
-      body.light .link-item:hover {
-        background-color: #f0f9ff;
-        box-shadow: 0 6px 12px rgba(56, 189, 248, 0.3);
+
+      body.light .submenu a {
+        color: #1e293b;
       }
+
+      body.light .submenu a:hover {
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 6px 14px rgba(56, 189, 248, 0.25);
+      }
+
       body.light .link-toggle.active {
         background: linear-gradient(90deg, #dbeafe, #eff6ff);
         box-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
       }
+
       body.light img {
         box-shadow: 0 0 12px rgba(147, 197, 253, 0.6);
         border-color: #cbd5e1;
+      }
+
+      /* === Footer === */
+      footer {
+        font-family: "Poppins", sans-serif;
+        opacity: 0.85;
+        letter-spacing: 0.3px;
+        transition: opacity 0.3s ease, color 0.3s ease;
+        position: relative;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: transparent;
+      }
+      footer:hover {
+        opacity: 1;
       }
     </style>
   </head>
@@ -167,7 +234,9 @@
         <img src="assets/images/logo.png" alt="Profile" />
         <div class="flex items-center space-x-2 mt-4">
           <h2 class="text-2xl font-semibold tracking-wide">Eliv Kurniawan</h2>
-          <button id="theme-toggle" title="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="theme-toggle" title="Toggle theme">
+            <i data-feather="sun"></i>
+          </button>
         </div>
         <p class="mt-1 text-gray-400 text-sm italic">Teacher at Vocational Highschool</p>
       </div>
@@ -195,12 +264,14 @@
             </a>
           </div>
         </div>
+
         <div class="link-block">
           <a href="https://linkedin.com/in/yourprofile" target="_blank" class="link-item">
             <i data-feather="codepen"></i>
             <span>Koding & Kecerdasan Artifisial - X</span>
           </a>
         </div>
+
         <div class="link-block">
           <a href="https://instagram.com/yourprofile" target="_blank" class="link-item">
             <i data-feather="globe"></i>
@@ -210,12 +281,52 @@
       </div>
     </div>
 
+    <!-- Footer -->
+    <footer
+      class="w-full text-center py-4 mt-10 text-sm tracking-wide relative z-10 transition-colors duration-500"
+      id="footer">
+      <p id="datetime" class="text-gray-400"></p>
+    </footer>
+
     <script>
+      /* === Date & Time (Indonesian) === */
+      const datetimeEl = document.getElementById("datetime");
+      function updateDateTime() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("id-ID", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const timeStr = now.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        datetimeEl.innerHTML = `${dateStr}, ${timeStr}`;
+      }
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+
+      /* === Footer theme sync === */
+      function updateFooterColor() {
+        const footer = document.getElementById("footer");
+        if (document.body.classList.contains("light")) {
+          footer.classList.remove("text-gray-400");
+          footer.classList.add("text-gray-600");
+        } else {
+          footer.classList.remove("text-gray-600");
+          footer.classList.add("text-gray-400");
+        }
+      }
+      updateFooterColor();
+      const observer = new MutationObserver(updateFooterColor);
+      observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+      /* === Feather & Submenu === */
       feather.replace();
-
-      // Submenu animation
       const staggerDuration = 80;
-
       const body = document.body;
       const toggleBtn = document.getElementById("theme-toggle");
 
@@ -236,7 +347,7 @@
             });
           } else {
             items.forEach((item) => {
-              item.style.transitionDelay = `0ms`;
+              item.style.transitionDelay = "0ms";
               item.style.opacity = "0";
               item.style.transform = "translateX(-20px)";
             });
@@ -261,15 +372,42 @@
         });
       });
 
-      // Theme toggle
-      let particleColor = "rgba(255,255,255,0.5)";
-      function updateParticleColor() {
-        particleColor = body.classList.contains("light") ? "rgba(30,30,30,0.5)" : "rgba(255,255,255,0.5)";
+      /* === Optimized Gradient Canvas === */
+      const canvas = document.getElementById("bg-canvas");
+      const ctx = canvas.getContext("2d");
+      let w = (canvas.width = window.innerWidth);
+      let h = (canvas.height = window.innerHeight);
+      let gradientShift = 0;
+      let lastTime = 0;
+
+      window.addEventListener("resize", () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      function drawGradient(time) {
+        if (time - lastTime > 30) {
+          gradientShift += 0.002;
+          const g = ctx.createLinearGradient(0, 0, w, h);
+          if (body.classList.contains("light")) {
+            g.addColorStop(0, `hsl(${(gradientShift * 80) % 360}, 90%, 90%)`);
+            g.addColorStop(1, `hsl(${(gradientShift * 80 + 120) % 360}, 85%, 95%)`);
+          } else {
+            g.addColorStop(0, `hsl(${(gradientShift * 80) % 360}, 35%, 20%)`);
+            g.addColorStop(1, `hsl(${(gradientShift * 80 + 120) % 360}, 35%, 10%)`);
+          }
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, w, h);
+          lastTime = time;
+        }
+        requestAnimationFrame(drawGradient);
       }
+      drawGradient(0);
+
+      /* === Theme Toggle === */
       if (localStorage.getItem("theme") === "light") {
         body.classList.add("light");
         toggleBtn.innerHTML = feather.icons["moon"].toSvg();
-        updateParticleColor();
       }
       toggleBtn.addEventListener("click", () => {
         body.classList.toggle("light");
@@ -277,55 +415,7 @@
         toggleBtn.innerHTML = body.classList.contains("light")
           ? feather.icons["moon"].toSvg()
           : feather.icons["sun"].toSvg();
-        updateParticleColor();
       });
-
-      // Pixel-like particles
-      const canvas = document.getElementById("bg-canvas");
-      const ctx = canvas.getContext("2d");
-      let w = (canvas.width = window.innerWidth);
-      let h = (canvas.height = window.innerHeight);
-      window.addEventListener("resize", () => {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-      });
-
-      class Particle {
-        constructor() {
-          this.x = Math.random() * w;
-          this.y = Math.random() * h;
-          this.size = Math.random() * 2 + 1; // pixel size
-          this.speed = Math.random() * 0.5 + 0.2;
-          this.alpha = Math.random() * 0.5 + 0.3;
-        }
-        update() {
-          this.y -= this.speed;
-          if (this.y < -5) {
-            this.y = h + 5;
-            this.x = Math.random() * w;
-            this.alpha = Math.random() * 0.5 + 0.3;
-            this.size = Math.random() * 2 + 1;
-            this.speed = Math.random() * 0.5 + 0.2;
-          }
-        }
-        draw() {
-          ctx.fillStyle = particleColor.replace("0.5", this.alpha);
-          ctx.fillRect(this.x, this.y, this.size, this.size);
-        }
-      }
-
-      const particles = [];
-      for (let i = 0; i < Math.floor((w * h) / 7000); i++) particles.push(new Particle());
-
-      function animate() {
-        ctx.clearRect(0, 0, w, h);
-        particles.forEach((p) => {
-          p.update();
-          p.draw();
-        });
-        requestAnimationFrame(animate);
-      }
-      animate();
     </script>
   </body>
 </html>
